@@ -42,7 +42,7 @@ class SongCommentListSpider(scrapy.Spider):
 
 			commentInfo['userName'] = commentTemp.xpath('.//div[@class="cnt f-brk"]/a/text()').extract_first()
 			commentInfo['content'] = commentTemp.xpath('.//div[@class="cnt f-brk"]/text()').extract_first()
-			commentInfo['like'] = commentTemp.xpath('.//div[@class="rp"]/a/text()').extract_first()
+			commentInfo['like'] = commentTemp.xpath('.//div[@class="rp"]/a[@data-type="like"]/text()').extract_first()
 			commentInfo['time'] = commentTemp.xpath('.//div[@class="time s-fc4"]/text()').extract_first()
 
 			replyInfo = {}
