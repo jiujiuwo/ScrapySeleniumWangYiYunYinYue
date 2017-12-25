@@ -10,10 +10,11 @@ import json
 import time
 
 class SongCommentListSpider(scrapy.Spider):
+	
 	name = 'SongCommentListSpider'
 
 	def start_requests(self):
-		urls = ['http://music.163.com/song?id=16426485&userid=269241661','http://music.163.com/song?id=2175282','http://music.163.com/song?id=427606738']
+		urls = ['https://music.163.com/song?id=409649831',]
 
 		for url in urls:
 			yield scrapy.Request(url = url,callback = self.parse)
@@ -71,6 +72,8 @@ class SongCommentListSpider(scrapy.Spider):
 			actions.move_to_element(btnNextPage)
 			actions.click(btnNextPage)
 			#如果没有线程的睡眠的话，会出错，经试验该值的最小值为3
+			#后面发现如果点击事件太快的话，页面的内容会保持不变。因此计算页面内容的hash值
+			preHash = hash(driver.page_source)
 			while(True):
 				try:
 					actions.perform()
@@ -78,12 +81,25 @@ class SongCommentListSpider(scrapy.Spider):
 				except:
 					time.sleep(1)
 			time.sleep(1)
-			#调用第一页评论的爬取函数
+			#调用第一页评论的爬取函数,计算点击下一页之后页面的哈希值有没有改变。
+			#如果没变的话，则继续等待浏览器
+			wait = 1
+			while(True):
+				nowHash = hash(driver.page_source)
+				if(preHash==nowHash):
+					time.sleep(wait)
+					if wait <= 3:
+						wait = wait +1
+					self.log(str(wait))
+				else:
+					break;
 			response = response.replace(body = driver.page_source)
 			commentPageList[str(i+2)]= self.parseSongComments(response= response)
+			self.log("爬取第%d页评论成功"% i)
 		return commentPageList
 
 	def parse(self,response):
+		startTime = time.time()
 		driver = webdriver.Chrome()
 		driver.get(response.url)
 		wait = WebDriverWait(driver,2)
@@ -107,9 +123,16 @@ class SongCommentListSpider(scrapy.Spider):
 		#汇总歌曲和评论信息并保存
 		songCommentListSpider = {'songInfo':songInfo,'commentPageList':commentPageList}
 		f = codecs.open(fileName,'w','utf-8')
-		f.write(json.dumps(songCommentListSpider))
+		f.write(str(songCommentListSpider))#
+		f.close()
+		f = codecs.open(fileName+'.json','w','utf-8')
+		#f.write(str(songCommentListSpider))
+		f.write(json.dumps(songCommentListSpider))#
 		f.close()
 		self.log('Saved file %s '% fileName)
+		endTime = time.time()
+		self.log('程序运行事件为 : '+str(endTime-startTime) )
+
 
 
 		#汇总评论和歌曲的基本信息并保存
