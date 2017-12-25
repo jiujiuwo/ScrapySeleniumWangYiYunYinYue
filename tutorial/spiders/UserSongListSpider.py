@@ -90,6 +90,11 @@ class UserSongListSpider(scrapy.Spider):
         userSongListSpider = {'userInfo':userInfo,'userCreateSongLists':userCreateSongLists,'userSaveSongLists':userSaveSongLists}
 
         f = codecs.open(file_name,'w','utf-8')
-        f.write(json.dumps(userSongListSpider))
+        f.write(str(userSongListSpider))
         f.close()
+        f = codecs.open(fileName+'.json','w','utf-8')
+        #f.write(str(songCommentListSpider))
+        f.write(json.dumps(songCommentListSpider))#
+        f.close()
+        self.log('Saved file %s '% fileName)
         self.log('Saved file %s ' % file_name)       

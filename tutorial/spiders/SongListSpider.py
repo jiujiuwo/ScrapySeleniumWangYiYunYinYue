@@ -62,6 +62,10 @@ class SongListSpider(scrapy.Spider):
 	 	#汇总歌单信息并保存
 	 	songListSpider = {'songListInfo':songListInfo,'songInfoList':songInfoList}
 	 	f = codecs.open(file_name,'w','utf-8')
-	 	f.write(json.dumps(songListSpider))
+	 	f.write(str(songListSpider))
+	 	f.close()
+	 	f = codecs.open(fileName+'.json','w','utf-8')
+	 	#f.write(str(songCommentListSpider))
+	 	f.write(json.dumps(songCommentListSpider))#
 	 	f.close()
 	 	self.log('Saved file %s ' % file_name)
