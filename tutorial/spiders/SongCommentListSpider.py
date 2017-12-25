@@ -131,7 +131,7 @@ class SongCommentListSpider(scrapy.Spider):
 		f.close()
 		self.log('Saved file %s '% fileName)
 		endTime = time.time()
-		self.log('程序运行事件为 : '+str(endTime-startTime) )
+		self.log('程序运行时间为 : '+str(endTime-startTime) )
 
 
 
